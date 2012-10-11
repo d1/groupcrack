@@ -1,14 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Groupcrack</title>
+  <title>Group Crack</title>
   <%= stylesheet_link_tag    "application", :media => "all" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li <%= raw active_link("home", "index") %>><%= link_to "Home", root_path %></li>
+            <li <%= raw active_link("home", "about") %>><%= link_to "About", about_path %></li>
+          </ul>
+          <p class="navbar-text pull-right">
+      	    <% if user_signed_in? %>
+      	    Signed in as <%= current_user.email %>. Not you?
+      	    <%= link_to "Sign out", destroy_user_session_path, method: :delete %>
+      	    <% else %>
+      	    <%= link_to "Sign up", new_user_registration_path %> or <%= link_to "sign in", new_user_session_path %>
+      	    <% end %>
+          </p>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+  </div>
+    
+  <div class="container">
+    <% flash.each do |name, msg| %>
+      <div class="alert alert-<%= name == :notice ? "success" : "error" %>">
+        <a class="close" data-dismiss="alert">×</a>
+        <%= msg %>
+      </div>
+    <% end %>
 
-<%= yield %>
+
+    <%= yield %>
+  </div>
 
 </body>
 </html>
