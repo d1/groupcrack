@@ -9,4 +9,4 @@ Eventually a scaled back version that can be run on free hosting services, speci
 Host as many groups within the same site, and scale your hosting plan as you get more traffic. 
 Designing new features that meet your needs as you grow is what GroupCrack is all about.
 
-**Group Crack is the code name for this project, while it is still in the development process. When this software is ready for a 1.0 release, it will most likely be renamed to something more marketing friendly**
+**Group Crack is the code name for this project while it is still in the development process. When this software is ready for a 1.0 release, it will most likely be renamed to something more marketing friendly.**
