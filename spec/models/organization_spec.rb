@@ -12,4 +12,8 @@ describe Organization do
   it { should respond_to :subdomain }
   it { should respond_to :description }
   
+  # describe "Organization creation process" do 
+  #   
+  # end
+  
 end

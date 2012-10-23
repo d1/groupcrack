@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121020030830) do
+ActiveRecord::Schema.define(:version => 20121022184135) do
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
@@ -19,6 +19,37 @@ ActiveRecord::Schema.define(:version => 20121020030830) do
     t.text     "description"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "setting_types", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.string   "keyword"
+    t.string   "site_or_org_specific"
+    t.integer  "user_specific",        :default => 0
+    t.integer  "user_modifiable",      :default => 0
+    t.integer  "locked",               :default => 0
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+  end
+
+  create_table "setting_values", :force => true do |t|
+    t.integer  "setting_type_id"
+    t.string   "name"
+    t.integer  "position",        :default => 0
+    t.integer  "default_value",   :default => 0
+    t.integer  "locked",          :default => 0
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+  end
+
+  create_table "settings", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "organization_id"
+    t.integer  "setting_type_id"
+    t.integer  "setting_value_id"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
   create_table "users", :force => true do |t|

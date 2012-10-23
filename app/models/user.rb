@@ -10,6 +10,8 @@ class User < ActiveRecord::Base
   attr_accessible :first_name, :last_name
   # attr_accessible :title, :body
   
+  has_many :settings
+  
   validates :first_name, :last_name, :presence => true
   
   def name
