@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121022184135) do
+ActiveRecord::Schema.define(:version => 20121029191857) do
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(:version => 20121022184135) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
+
+  add_index "organizations", ["subdomain"], :name => "index_organizations_on_subdomain", :unique => true
 
   create_table "setting_types", :force => true do |t|
     t.string   "name"
@@ -33,6 +35,10 @@ ActiveRecord::Schema.define(:version => 20121022184135) do
     t.datetime "updated_at",                          :null => false
   end
 
+  add_index "setting_types", ["keyword"], :name => "index_setting_types_on_keyword", :unique => true
+  add_index "setting_types", ["site_or_org_specific"], :name => "index_setting_types_on_site_or_org_specific"
+  add_index "setting_types", ["user_modifiable"], :name => "index_setting_types_on_user_modifiable"
+
   create_table "setting_values", :force => true do |t|
     t.integer  "setting_type_id"
     t.string   "name"
@@ -41,16 +47,28 @@ ActiveRecord::Schema.define(:version => 20121022184135) do
     t.integer  "locked",          :default => 0
     t.datetime "created_at",                     :null => false
     t.datetime "updated_at",                     :null => false
+    t.string   "keyword"
   end
+
+  add_index "setting_values", ["default_value"], :name => "index_setting_values_on_default_value"
+  add_index "setting_values", ["keyword"], :name => "index_setting_values_on_keyword"
+  add_index "setting_values", ["setting_type_id"], :name => "index_setting_values_on_setting_type_id"
 
   create_table "settings", :force => true do |t|
     t.integer  "user_id"
     t.integer  "organization_id"
     t.integer  "setting_type_id"
     t.integer  "setting_value_id"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+    t.integer  "priority",         :default => 10
   end
+
+  add_index "settings", ["organization_id"], :name => "index_settings_on_organization_id"
+  add_index "settings", ["priority"], :name => "index_settings_on_priority"
+  add_index "settings", ["setting_type_id"], :name => "index_settings_on_setting_type_id"
+  add_index "settings", ["setting_value_id"], :name => "index_settings_on_setting_value_id"
+  add_index "settings", ["user_id"], :name => "index_settings_on_user_id"
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "", :null => false

@@ -3,4 +3,12 @@ class SettingType < ActiveRecord::Base
   
   has_many :setting_values
   has_many :settings
+  
+  after_create :generate_keyword
+  
+  def generate_keyword
+    self.keyword = self.name.gsub(' ', '_').downcase
+    save
+  end
+
 end

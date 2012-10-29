@@ -1,10 +1,11 @@
 class SettingValue < ActiveRecord::Base
-  attr_accessible :default, :locked, :name, :position, :setting_type_id
+  attr_accessible :default_value, :locked, :name, :position, :setting_type_id
   
   belongs_to :setting_type
   has_many :settings
   
   after_save :verify_only_one_default
+  after_create :generate_keyword
   
   def verify_only_one_default
     if self.default_value == 1
@@ -16,5 +17,11 @@ class SettingValue < ActiveRecord::Base
       end
     end
   end
+  
+  def generate_keyword
+    self.keyword = self.name.gsub(' ', '_').downcase
+    save
+  end
+  
   
 end
