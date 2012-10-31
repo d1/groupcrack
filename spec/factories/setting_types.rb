@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :setting_type do
-    name "MyString"
+    sequence(:name) { |n| "MyString #{n}"}
     description "MyText"
     site_or_org_specific "both"
     user_specific 1
