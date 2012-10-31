@@ -10,6 +10,7 @@ gem 'devise'
 gem 'twitter-bootstrap-rails'
 gem 'turbolinks'
 gem 'turbo-sprockets-rails3'
+gem 'seedbank'
 
 group :development, :test do
   gem 'rspec-rails'

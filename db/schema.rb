@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121029191857) do
+ActiveRecord::Schema.define(:version => 20121031180627) do
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
@@ -22,6 +22,14 @@ ActiveRecord::Schema.define(:version => 20121029191857) do
   end
 
   add_index "organizations", ["subdomain"], :name => "index_organizations_on_subdomain", :unique => true
+
+  create_table "seed_files", :force => true do |t|
+    t.string   "keyword"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "seed_files", ["keyword"], :name => "index_seed_files_on_keyword", :unique => true
 
   create_table "setting_types", :force => true do |t|
     t.string   "name"
