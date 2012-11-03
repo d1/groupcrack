@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :organization do
-    name "MyString"
+    sequence(:name) { |n| "Organization #{n}"}
     sequence(:subdomain) { |n| "subdomain#{n}"}
     description "MyText"
   end

@@ -1,4 +1,6 @@
 Groupcrack::Application.routes.draw do
+  
+  resources :organizations
 
   get "home/index"
   match '/about', :to => 'home#about', :via => :get, :as => :about
