@@ -11,7 +11,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121031180627) do
+ActiveRecord::Schema.define(:version => 20121103181215) do
+
+  create_table "organization_role_settings", :force => true do |t|
+    t.integer "organization_role_id"
+    t.integer "setting_type_id"
+    t.integer "setting_value_id"
+  end
+
+  create_table "organization_roles", :force => true do |t|
+    t.integer "organization_id"
+    t.string  "name"
+    t.integer "sign_up_role",    :default => 0
+    t.integer "admin_role",      :default => 0
+  end
 
   create_table "organizations", :force => true do |t|
     t.string   "name"
@@ -77,6 +90,14 @@ ActiveRecord::Schema.define(:version => 20121031180627) do
   add_index "settings", ["setting_type_id"], :name => "index_settings_on_setting_type_id"
   add_index "settings", ["setting_value_id"], :name => "index_settings_on_setting_value_id"
   add_index "settings", ["user_id"], :name => "index_settings_on_user_id"
+
+  create_table "user_memberships", :force => true do |t|
+    t.integer "user_id"
+    t.integer "organization_id"
+    t.integer "organization_role_id"
+    t.date    "start_date"
+    t.date    "end_date"
+  end
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "", :null => false

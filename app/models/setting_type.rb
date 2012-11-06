@@ -3,6 +3,7 @@ class SettingType < ActiveRecord::Base
   
   has_many :setting_values
   has_many :settings
+  has_many :organization_role_settings
   
   after_create :generate_keyword
   

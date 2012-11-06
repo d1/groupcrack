@@ -3,6 +3,7 @@ class SettingValue < ActiveRecord::Base
   
   belongs_to :setting_type
   has_many :settings
+  has_many :organization_role_settings
   
   after_save :verify_only_one_default
   after_create :generate_keyword
