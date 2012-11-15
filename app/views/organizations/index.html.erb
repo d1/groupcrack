@@ -1,20 +1,12 @@
 <h1>Listing organizations</h1>
 
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Subdomain</th>
-    <th>Description</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
+<table class="table">
+  
 <% @organizations.each do |organization| %>
   <tr>
-    <td><%= organization.name %></td>
-    <td><%= organization.subdomain %></td>
-    <td><%= organization.description %></td>
+    <td><%= link_to organization.name, root_url(subdomain: organization.subdomain) %><br/>
+    <%= organization.description %></td>
+    <!-- <td><%= organization.subdomain %></td> -->
     <td><%= link_to 'Show', organization %></td>
     <td><%= link_to 'Edit', edit_organization_path(organization) %></td>
     <td><%= link_to 'Destroy', organization, method: :delete, data: { confirm: 'Are you sure?' } %></td>

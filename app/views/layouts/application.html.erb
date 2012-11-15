@@ -19,6 +19,7 @@
           <ul class="nav">
             <li <%= raw active_link("home", "index") %>><%= link_to "Home", root_path %></li>
             <li <%= raw active_link("home", "about") %>><%= link_to "About", about_path %></li>
+            <li <%= raw active_link("organizations", "index") %>><%= link_to "Organizations", organizations_path %></li>
           </ul>
           <p class="navbar-text pull-right">
       	    <% if user_signed_in? %>

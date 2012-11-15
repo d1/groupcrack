@@ -7,5 +7,11 @@ describe "Organizations" do
       get organizations_path
       response.status.should be(200)
     end
+    
+    it "has a title in the layout" do
+      visit organizations_path
+      page.should have_selector('title',
+                          text: "Groupcrack")
+    end
   end
 end
