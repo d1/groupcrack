@@ -8,6 +8,24 @@ class Setting < ActiveRecord::Base
   
   after_create :determine_priority
   
+  # Scope Constants
+  SiteSpecific = Class.new
+  OrgSpecific = Class.new
+  UserSpecific = Class.new
+  UserOrgSpecific = Class.new  
+  
+  def self.get_scope(options)
+    if options[:organization_id].present? && options[:user_id].present?
+      UserOrgSpecific
+    elsif options[:organization_id].present?
+      OrgSpecific
+    elsif options[:user_id].present?
+      UserSpecific
+    else
+      SiteSpecific
+    end    
+  end
+      
   def self.get_value(keyword)
     setting = Setting.includes(:setting_value, :setting_type).where(
       "setting_types.keyword = ? && 

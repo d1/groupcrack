@@ -2,6 +2,37 @@ require 'spec_helper'
 
 describe Setting do
   
+  describe "Using Scope Assignments" do
+    it "should return SiteSpecific" do 
+      org_id = nil
+      user_id = nil
+      setting_scope = Setting.get_scope(organization_id: org_id, user_id: user_id)
+      setting_scope.should == Setting::SiteSpecific
+    end
+    
+    it "should return UserSpecific" do 
+      org_id = nil
+      user_id = 1
+      setting_scope = Setting.get_scope(organization_id: org_id, user_id: user_id)
+      setting_scope.should == Setting::UserSpecific
+    end
+    
+    it "should return OrgSpecific" do 
+      org_id = 1
+      user_id = nil
+      setting_scope = Setting.get_scope(organization_id: org_id, user_id: user_id)
+      setting_scope.should == Setting::OrgSpecific
+    end
+    
+    it "should return UserOrgSpecific" do 
+      org_id = 1
+      user_id = 1
+      setting_scope = Setting.get_scope(organization_id: org_id, user_id: user_id)
+      setting_scope.should == Setting::UserOrgSpecific
+    end
+    
+  end
+  
   describe "Testing factory girl" do 
     before { @setting = FactoryGirl.create(:org_user_setting) }
     subject { @setting.setting_type.site_or_org_specific }
@@ -67,9 +98,6 @@ describe Setting do
       setting_value_d = Setting.get_user_org_value("show_lastname_to_nonmembers", @user_d, @org_b)
       setting_value_d.should == "no"
     end
-  
   end
-
-  
 end
 
