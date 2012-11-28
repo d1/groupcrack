@@ -21,5 +21,9 @@ FactoryGirl.define do
     factory :org_specific_setting_type do
       site_or_org_specific "org"
     end
+    
+    factory :user_hidden_setting_type do
+      user_modifiable 0
+    end
   end
 end

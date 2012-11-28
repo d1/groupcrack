@@ -2,6 +2,82 @@ require 'spec_helper'
 
 describe Setting do
   
+  describe "listings" do
+    
+    before do
+      @site_specific_setting = FactoryGirl.create(:site_setting)
+      @org_specific_setting = FactoryGirl.create(:org_setting)
+      @hidden_user_setting_type = FactoryGirl.create(:user_hidden_setting_type)
+      @default_value_setting_type = FactoryGirl.create(:setting_type)
+      @user_specific_site_setting = FactoryGirl.create(:site_user_setting)
+      @user_specific_org_setting = FactoryGirl.create(:org_user_setting)
+    end
+    
+    it "should include site settings when no organization is specified" do
+      setting_list = Setting.list_settings(organization: nil, user_id: nil)
+      setting_list.map{|setting| setting['setting_type_id']}.should include @site_specific_setting.setting_type.id
+    end
+    
+    it "should not include organization specific settings when reviewing site settings" do
+      setting_list = Setting.list_settings(organization: nil, user_id: nil)
+      setting_list.map{|setting| setting['setting_type_id']}.should_not include @org_specific_setting.setting_type.id
+    end
+    
+    it "should include organization specific settings when organization is specified" do
+      setting_list = Setting.list_settings(organization_id: 5, user_id: nil)
+      setting_list.map{|setting| setting['setting_type_id']}.should include @org_specific_setting.setting_type.id
+    end
+    
+    it "should not include site specific settings when organization is specified" do
+      setting_list = Setting.list_settings(organization_id: 5, user_id: nil)
+      setting_list.map{|setting| setting['setting_type_id']}.should_not include @site_specific_setting.setting_type.id
+    end
+    
+    it "should return default values when there is no specified setting value" do
+      # this test is locked into the concept that there is only one default value, would need to be re-written if that assumption ever changes
+      setting_list = Setting.list_settings(organization_id: 5, user_id: nil)
+      setting_list.each do |setting|
+        if setting['setting_type_id'] == @default_value_setting_type.id
+          @default_value_setting_type.setting_values.each do |setting_value|
+            if setting_value.default_value == 1
+              setting['value'].should == setting_value.keyword
+              setting['value_choice'].should == 'default'
+            end
+          end
+        end
+      end
+    end
+    
+    it "... UNRELATED factory girl circular reference test" do 
+      @user_specific_site_setting.setting_value.setting_type_id.should == @user_specific_site_setting.setting_type_id
+    end
+    
+    it "should return specified user value when user is specified" do
+      user_id = @user_specific_site_setting.user_id
+      setting_list = Setting.list_settings(organization_id: nil, user_id: user_id)
+      setting_list.each do |setting|
+        if setting['setting_type_id'] == @user_specific_site_setting.setting_type_id
+          setting['value'].should == @user_specific_site_setting.setting_value.keyword
+        end
+      end
+    end
+    
+    it "should only show hidden settings when admin privileges are given" do
+      setting_list = Setting.list_settings(organization_id: nil, user_id: nil, admin_right: true)
+      setting_list.map{|setting| setting['setting_type_id']}.should include @hidden_user_setting_type.id
+    end
+
+    it "should not show hidden settings when admin privileges are not given" do
+      setting_list = Setting.list_settings(organization_id: nil, user_id: nil)
+      setting_list.map{|setting| setting['setting_type_id']}.should_not include @hidden_user_setting_type.id
+    end
+
+    # it "should include user specific settings when user is specified"
+    # it "should not include non-user specific settings when user is specified"
+    # it "should include user and organization specific settings when both are specified"
+    
+  end
+  
   describe "Using Scope Assignments" do
     it "should return SiteSpecific" do 
       org_id = nil
