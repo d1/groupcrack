@@ -48,19 +48,14 @@ class Setting < ActiveRecord::Base
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.organization_id is null")
     end
     
-    # I need to spend more time thinking about this code, because I may want to get user specific settings without specifying a user to review or change the defaults
-    # using site administrator as an example, what if I wanted to set the default for everyone to be site admin for some bizzare reason
-    
-    # if scope == Setting::UserOrgSpecific || scope == Setting::UserSpecific
-    #   seting_types_with_defaults = seting_types_with_defaults.where("setting_types.user_specific = 1")
-    #   setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.user_specific = 1")
-    #   setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user].id) if options[:user].present?
-    #   setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user_id]) if options[:user_id].present?
-    # else
-    #   seting_types_with_defaults = seting_types_with_defaults.where("setting_types.user_specific = 0")
-    #   setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.user_specific = 0")
-    #   setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id is null")
-    # end
+    if scope == Setting::UserOrgSpecific || scope == Setting::UserSpecific
+      seting_types_with_defaults = seting_types_with_defaults.where("setting_types.user_specific = 1")
+      setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.user_specific = 1")
+      setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user].id) if options[:user].present?
+      setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user_id]) if options[:user_id].present?
+    else
+      setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id is null")
+    end
     
     if options[:admin_right].nil? || options[:admin_right] == false
       # only user_modifiable settings can be displayed if admin rights are not given

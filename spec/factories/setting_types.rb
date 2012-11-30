@@ -25,5 +25,9 @@ FactoryGirl.define do
     factory :user_hidden_setting_type do
       user_modifiable 0
     end
+    
+    factory :non_user_setting_type do
+      user_specific 0
+    end
   end
 end

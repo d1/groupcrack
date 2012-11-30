@@ -11,6 +11,7 @@ describe Setting do
       @default_value_setting_type = FactoryGirl.create(:setting_type)
       @user_specific_site_setting = FactoryGirl.create(:site_user_setting)
       @user_specific_org_setting = FactoryGirl.create(:org_user_setting)
+      @non_user_setting = FactoryGirl.create(:non_user_setting)
     end
     
     it "should include site settings when no organization is specified" do
@@ -62,6 +63,21 @@ describe Setting do
       end
     end
     
+    it "should not return a user value when user is not specified" do
+      organization_id = @user_specific_site_setting.organization_id
+      setting_list = Setting.list_settings(organization_id: organization_id, user_id: nil)
+      setting_list.each do |setting|
+        if setting['setting_type_id'] == @user_specific_site_setting.setting_type_id
+          @user_specific_site_setting.setting_type.setting_values.each do |setting_value|
+            if setting_value.default_value == 1
+              setting['value'].should == setting_value.keyword
+              setting['value_choice'].should == 'default'
+            end
+          end
+        end
+      end
+    end
+    
     it "should only show hidden settings when admin privileges are given" do
       setting_list = Setting.list_settings(organization_id: nil, user_id: nil, admin_right: true)
       setting_list.map{|setting| setting['setting_type_id']}.should include @hidden_user_setting_type.id
@@ -71,11 +87,11 @@ describe Setting do
       setting_list = Setting.list_settings(organization_id: nil, user_id: nil)
       setting_list.map{|setting| setting['setting_type_id']}.should_not include @hidden_user_setting_type.id
     end
-
-    # it "should include user specific settings when user is specified"
-    # it "should not include non-user specific settings when user is specified"
-    # it "should include user and organization specific settings when both are specified"
     
+    it "should not display non user settings when a user is specified" do
+      setting_list = Setting.list_settings(organization_id: nil, user_id: 5)
+      setting_list.map{|setting| setting['setting_type_id']}.should_not include @non_user_setting.setting_type_id
+    end    
   end
   
   describe "Using Scope Assignments" do

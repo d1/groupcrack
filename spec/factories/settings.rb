@@ -7,6 +7,11 @@ FactoryGirl.define do
     # ARGH! factory girl doesn't do circular references so this value actually belongs to a diferent type
     # best solution I could find is to use an after(:create) block to assign the setting_value
     priority 10
+    
+    factory :non_user_setting do
+      association :setting_type, factory: :non_user_setting_type
+      priority 10
+    end
 
     factory :site_setting do
       # setting_type org_specific_setting
