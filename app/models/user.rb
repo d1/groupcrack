@@ -17,4 +17,35 @@ class User < ActiveRecord::Base
   def name
     self.first_name + " " + self.last_name
   end
+  
+  def has_admin_role_at(organization)
+    has_admin_role = false
+    
+    # check out user/organization membership
+    if organization.present?
+      current_membership = UserMembership.joins(:organization_role).
+        where('organization_roles.admin_role' => 1, user_id: self.id, organization_id: organization.id).
+        where("end_date IS NULL").first
+      if current_membership.present?
+        has_admin_role = true
+      end
+    end
+    
+    # check for site_administrator
+    if has_admin_role == false && self.has_setting_value('site_administrator', 'yes')
+      has_admin_role = true
+    end
+    
+    has_admin_role
+  end
+  
+  def has_setting_value(setting_keyword, setting_value)
+    has_setting = false
+    user_setting = Setting.get_user_value(setting_keyword, self)
+    if user_setting == setting_value
+      has_setting = true
+    end
+    has_setting
+  end
+  
 end
