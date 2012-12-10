@@ -20,6 +20,9 @@
             <li <%= raw active_link("home", "index") %>><%= link_to "Home", root_path %></li>
             <li <%= raw active_link("home", "about") %>><%= link_to "About", about_path %></li>
             <li <%= raw active_link("organizations", "index") %>><%= link_to "Organizations", organizations_path %></li>
+            <% if user_signed_in? %>
+              <li <%= raw active_link("settings", "index") %>><%= link_to "Settings", settings_path %></li>
+            <% end %>
           </ul>
           <p class="navbar-text pull-right">
       	    <% if user_signed_in? %>

@@ -1,5 +1,6 @@
 Groupcrack::Application.routes.draw do
   
+  resources :settings
   resources :organizations
 
   match '/welcome', :to => "welcome#index", :via => :get, :as => :welcome
