@@ -16,33 +16,33 @@ describe Setting do
     
     it "should include site settings when no organization is specified" do
       setting_list = Setting.list_settings(organization: nil, user_id: nil)
-      setting_list.map{|setting| setting['setting_type_id']}.should include @site_specific_setting.setting_type.id
+      setting_list.map{|setting| setting[:setting_type_id]}.should include @site_specific_setting.setting_type.id
     end
     
     it "should not include organization specific settings when reviewing site settings" do
       setting_list = Setting.list_settings(organization: nil, user_id: nil)
-      setting_list.map{|setting| setting['setting_type_id']}.should_not include @org_specific_setting.setting_type.id
+      setting_list.map{|setting| setting[:setting_type_id]}.should_not include @org_specific_setting.setting_type.id
     end
     
     it "should include organization specific settings when organization is specified" do
       setting_list = Setting.list_settings(organization_id: 5, user_id: nil)
-      setting_list.map{|setting| setting['setting_type_id']}.should include @org_specific_setting.setting_type.id
+      setting_list.map{|setting| setting[:setting_type_id]}.should include @org_specific_setting.setting_type.id
     end
     
     it "should not include site specific settings when organization is specified" do
       setting_list = Setting.list_settings(organization_id: 5, user_id: nil)
-      setting_list.map{|setting| setting['setting_type_id']}.should_not include @site_specific_setting.setting_type.id
+      setting_list.map{|setting| setting[:setting_type_id]}.should_not include @site_specific_setting.setting_type.id
     end
     
     it "should return default values when there is no specified setting value" do
       # this test is locked into the concept that there is only one default value, would need to be re-written if that assumption ever changes
       setting_list = Setting.list_settings(organization_id: 5, user_id: nil)
       setting_list.each do |setting|
-        if setting['setting_type_id'] == @default_value_setting_type.id
+        if setting[:setting_type_id] == @default_value_setting_type.id
           @default_value_setting_type.setting_values.each do |setting_value|
             if setting_value.default_value == 1
-              setting['value'].should == setting_value.keyword
-              setting['value_choice'].should == 'default'
+              setting[:value].should == setting_value.keyword
+              setting[:value_choice].should == 'default'
             end
           end
         end
@@ -57,8 +57,8 @@ describe Setting do
       user_id = @user_specific_site_setting.user_id
       setting_list = Setting.list_settings(organization_id: nil, user_id: user_id)
       setting_list.each do |setting|
-        if setting['setting_type_id'] == @user_specific_site_setting.setting_type_id
-          setting['value'].should == @user_specific_site_setting.setting_value.keyword
+        if setting[:setting_type_id] == @user_specific_site_setting.setting_type_id
+          setting[:value].should == @user_specific_site_setting.setting_value.keyword
         end
       end
     end
@@ -67,11 +67,11 @@ describe Setting do
       organization_id = @user_specific_site_setting.organization_id
       setting_list = Setting.list_settings(organization_id: organization_id, user_id: nil)
       setting_list.each do |setting|
-        if setting['setting_type_id'] == @user_specific_site_setting.setting_type_id
+        if setting[:setting_type_id] == @user_specific_site_setting.setting_type_id
           @user_specific_site_setting.setting_type.setting_values.each do |setting_value|
             if setting_value.default_value == 1
-              setting['value'].should == setting_value.keyword
-              setting['value_choice'].should == 'default'
+              setting[:value].should == setting_value.keyword
+              setting[:value_choice].should == 'default'
             end
           end
         end
@@ -80,17 +80,17 @@ describe Setting do
     
     it "should only show hidden settings when admin privileges are given" do
       setting_list = Setting.list_settings(organization_id: nil, user_id: nil, admin_right: true)
-      setting_list.map{|setting| setting['setting_type_id']}.should include @hidden_user_setting_type.id
+      setting_list.map{|setting| setting[:setting_type_id]}.should include @hidden_user_setting_type.id
     end
 
     it "should not show hidden settings when admin privileges are not given" do
       setting_list = Setting.list_settings(organization_id: nil, user_id: nil)
-      setting_list.map{|setting| setting['setting_type_id']}.should_not include @hidden_user_setting_type.id
+      setting_list.map{|setting| setting[:setting_type_id]}.should_not include @hidden_user_setting_type.id
     end
     
     it "should not display non user settings when a user is specified" do
       setting_list = Setting.list_settings(organization_id: nil, user_id: 5)
-      setting_list.map{|setting| setting['setting_type_id']}.should_not include @non_user_setting.setting_type_id
+      setting_list.map{|setting| setting[:setting_type_id]}.should_not include @non_user_setting.setting_type_id
     end    
   end
   

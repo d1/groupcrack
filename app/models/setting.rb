@@ -72,17 +72,19 @@ class Setting < ActiveRecord::Base
     
     seting_types_with_defaults.each do |setting_type|
       setting_type_hash = Hash.new
-      setting_type_hash['setting_type_id'] = setting_type.id
-      setting_type_hash['name'] = setting_type.name
-      setting_type_hash['description'] = setting_type.description
+      setting_type_hash[:setting_type_id] = setting_type.id
+      setting_type_hash[:name] = setting_type.name
+      setting_type_hash[:description] = setting_type.description
 
       # is there a selected value?
       if selected_values_hash[setting_type.id.to_s].present?
-        setting_type_hash['value'] = selected_values_hash[setting_type.id.to_s].keyword
-        setting_type_hash['value_choice'] = 'selected'
+        setting_type_hash[:value] = selected_values_hash[setting_type.id.to_s].keyword
+        setting_type_hash[:value_name] = selected_values_hash[setting_type.id.to_s].name
+        setting_type_hash[:value_choice] = 'selected'
       else
-        setting_type_hash['value'] = setting_type.setting_values[0].keyword
-        setting_type_hash['value_choice'] = 'default'
+        setting_type_hash[:value] = setting_type.setting_values[0].keyword
+        setting_type_hash[:value_name] = setting_type.setting_values[0].name
+        setting_type_hash[:value_choice] = 'default'
       end
       
       settings_list.push(setting_type_hash)

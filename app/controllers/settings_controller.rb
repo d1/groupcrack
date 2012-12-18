@@ -25,6 +25,8 @@ class SettingsController < ApplicationController
   end
 
   def edit
+    @setting_type = SettingType.find(params[:id])
+    # @checked_value = 2
   end
 
   def update

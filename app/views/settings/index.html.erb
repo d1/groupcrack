@@ -1,3 +1,19 @@
 <h1>Settings</h1>
 
 <!-- list settings here -->
+<table class="table">
+  <% @settings_list.each do |setting| %>
+<tr>
+  <td><h4><%= setting[:name] %></h4><%= setting[:description] %></td>
+  <td><%= setting[:value_name] %> <%= raw '<em>(default)</em>' if setting[:value_choice] == 'default' %></td>
+  <td>
+    <!-- <%# put edit_params_helper here? %> -->
+    <% if @user.present? %>
+    <%= link_to "Edit", edit_setting_path(id: setting[:setting_type_id], user_id: @user.id) %>
+    <% else %>
+    <%= link_to "Edit", edit_setting_path(id: setting[:setting_type_id]) %>
+    <% end %>
+  </td>
+</tr>
+<% end %>
+</table>

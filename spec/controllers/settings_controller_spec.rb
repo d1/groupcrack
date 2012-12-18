@@ -36,7 +36,7 @@ describe SettingsController do
     
     it "will allow another user to be passed to list_settings if user is an admin" do
       some_other_user = FactoryGirl.create(:user)
-      user = mock_model(User)
+      user = stub_model(User)
       controller.stub :current_user => user
       user.stub(:has_admin_role_at).and_return(true)
       current_organization = FactoryGirl.create(:organization)
@@ -45,6 +45,10 @@ describe SettingsController do
       get :index, :user_id => some_other_user.id
       assigns(:current_user_is_admin).should eq(true)
     end
+  end
+  
+  describe "edit" do
+    it "will validate if current_user is admin, just like index"
   end
   
 end
