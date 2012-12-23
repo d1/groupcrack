@@ -33,23 +33,22 @@ class Setting < ActiveRecord::Base
   
   def self.list_settings(options)
     scope = Setting.get_scope(options)
-    settings_list = Array.new
-    seting_types_with_defaults = SettingType.includes(:setting_values).where("setting_values.default_value = 1")
+    setting_types_with_defaults = SettingType.includes(:setting_values).where("setting_values.default_value = 1")
     setting_types_with_selected_values = SettingType.includes(:settings => :setting_value)
     
     if scope == Setting::UserOrgSpecific || scope == Setting::OrgSpecific
-      seting_types_with_defaults = seting_types_with_defaults.where("(setting_types.site_or_org_specific = 'org' || setting_types.site_or_org_specific = 'both')")
+      setting_types_with_defaults = setting_types_with_defaults.where("(setting_types.site_or_org_specific = 'org' || setting_types.site_or_org_specific = 'both')")
       setting_types_with_selected_values = setting_types_with_selected_values.where("(setting_types.site_or_org_specific = 'org' || setting_types.site_or_org_specific = 'both')")
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.organization_id = ?", options[:organization].id) if options[:organization].present?
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.organization_id = ?", options[:organization_id]) if options[:organization_id].present?
     else
-      seting_types_with_defaults = seting_types_with_defaults.where("(setting_types.site_or_org_specific = 'site' || setting_types.site_or_org_specific = 'both')")
+      setting_types_with_defaults = setting_types_with_defaults.where("(setting_types.site_or_org_specific = 'site' || setting_types.site_or_org_specific = 'both')")
       setting_types_with_selected_values = setting_types_with_selected_values.where("(setting_types.site_or_org_specific = 'site' || setting_types.site_or_org_specific = 'both')")
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.organization_id is null")
     end
     
     if scope == Setting::UserOrgSpecific || scope == Setting::UserSpecific
-      seting_types_with_defaults = seting_types_with_defaults.where("setting_types.user_specific = 1")
+      setting_types_with_defaults = setting_types_with_defaults.where("setting_types.user_specific = 1")
       setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.user_specific = 1")
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user].id) if options[:user].present?
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user_id]) if options[:user_id].present?
@@ -59,18 +58,20 @@ class Setting < ActiveRecord::Base
     
     if options[:admin_right].nil? || options[:admin_right] == false
       # only user_modifiable settings can be displayed if admin rights are not given
-      seting_types_with_defaults = seting_types_with_defaults.where("setting_types.user_modifiable = 1")
+      setting_types_with_defaults = setting_types_with_defaults.where("setting_types.user_modifiable = 1")
       setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.user_modifiable = 1")
     end
     
+    settings_list = Array.new
     selected_values_hash = Hash.new
+
     setting_types_with_selected_values.each do |selected_type|
       if selected_type.settings[0].present?
         selected_values_hash[selected_type.id.to_s] = selected_type.settings[0].setting_value
       end
     end
     
-    seting_types_with_defaults.each do |setting_type|
+    setting_types_with_defaults.each do |setting_type|
       setting_type_hash = Hash.new
       setting_type_hash[:setting_type_id] = setting_type.id
       setting_type_hash[:name] = setting_type.name
