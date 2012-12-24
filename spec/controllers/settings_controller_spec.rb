@@ -48,7 +48,58 @@ describe SettingsController do
   end
   
   describe "edit" do
-    it "will validate if current_user is admin, just like index"
+    it "will find current setting because it is on the approved list" do
+      Setting.should_receive(:list_settings).and_return([
+        {
+          setting_type_id: 15,
+          name: "Setting 1",
+          description: "Text goes here",
+          value_id: 556,
+          value: 'yes',
+          value_name: 'Yes',
+          value_choice: 'default'
+        },
+        {
+          setting_type_id: 16,
+          name: "Setting 2",
+          description: "Other text goes here",
+          value: 'no',
+          value_name: 'No',
+          value_choice: 'selected'
+        }
+      ])
+      SettingType.should_receive(:find).with("15")
+      get :edit, :id => 15
+      assigns(:checked_value).should == 556
+    end
+
+    it "will not find current setting, verify redirect to index" do
+      Setting.should_receive(:list_settings).and_return([
+        {
+          setting_type_id: 15,
+          name: "Setting 1",
+          description: "Text goes here",
+          value_id: 556,
+          value: 'yes',
+          value_name: 'Yes',
+          value_choice: 'default'
+        },
+        {
+          setting_type_id: 16,
+          name: "Setting 2",
+          description: "Other text goes here",
+          value: 'no',
+          value_name: 'No',
+          value_choice: 'selected'
+        }
+      ])
+      get :edit, :id => 12345
+      response.should redirect_to(settings_path)
+    end
+  end
+  
+  describe "update" do
+    # ... write update tests here
   end
   
 end

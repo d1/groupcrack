@@ -1,17 +1,11 @@
 <h1><%= @setting_type.name %></h1>
 <p><%= @setting_type.description %></p>
 
-<%= form_tag settings_path(@setting_type.id), :method => :put do %>
+<%= form_tag setting_path(@setting_type), :method => :put do %>
 
 <% @setting_type.setting_values.each do |setting_value| %>
 <div class="field">
   <label class="radio">
-    <%#
-    checkbox_is_checked = false    
-    if @checked_value == setting_value.id
-      checkbox_is_checked = true
-    end
-    %>
     <%= radio_button_tag 'setting_value', setting_value.id, @checked_value == setting_value.id %>
     <%= setting_value.name %>
   </label>
@@ -24,3 +18,22 @@
 
 <%= submit_tag "Submit" %>
 <% end %>
+
+<h1>Settings</h1>
+
+<table class="table">
+  <% @settings_list.each do |setting| %>
+<tr>
+  <td><h4><%= setting[:name] %></h4><%= setting[:description] %></td>
+  <td><%= setting[:value_name] %> <%= raw '<em>(default)</em>' if setting[:value_choice] == 'default' %></td>
+  <td>
+    <!-- <%# put edit_params_helper here? %> -->
+    <% if @user.present? %>
+    <%= link_to "Edit", edit_setting_path(id: setting[:setting_type_id], user_id: @user.id) %>
+    <% else %>
+    <%= link_to "Edit", edit_setting_path(id: setting[:setting_type_id]) %>
+    <% end %>
+  </td>
+</tr>
+<% end %>
+</table>

@@ -79,10 +79,12 @@ class Setting < ActiveRecord::Base
 
       # is there a selected value?
       if selected_values_hash[setting_type.id.to_s].present?
+        setting_type_hash[:value_id] = selected_values_hash[setting_type.id.to_s].id
         setting_type_hash[:value] = selected_values_hash[setting_type.id.to_s].keyword
         setting_type_hash[:value_name] = selected_values_hash[setting_type.id.to_s].name
         setting_type_hash[:value_choice] = 'selected'
       else
+        setting_type_hash[:value_id] = setting_type.setting_values[0].id
         setting_type_hash[:value] = setting_type.setting_values[0].keyword
         setting_type_hash[:value_name] = setting_type.setting_values[0].name
         setting_type_hash[:value_choice] = 'default'
