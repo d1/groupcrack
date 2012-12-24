@@ -31,6 +31,9 @@ class Setting < ActiveRecord::Base
     end    
   end
   
+  def self.save_setting(options)
+  end
+  
   def self.list_settings(options)
     scope = Setting.get_scope(options)
     setting_types_with_defaults = SettingType.includes(:setting_values).where("setting_values.default_value = 1")

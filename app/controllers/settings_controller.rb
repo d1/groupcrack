@@ -4,7 +4,6 @@ class SettingsController < ApplicationController
   
   def index
     obtain_settings
-
   end
 
   def show
@@ -25,13 +24,18 @@ class SettingsController < ApplicationController
       @checked_value = @current_setting[:value_id]
     else
       flash[:notice] = "redirected from invalid form"
-      redirect_to settings_path
+      redirect_to settings_path(is_user_present?)
     end
   end
 
   def update
-    flash[:notice] = "update complete"
-    redirect_to settings_path
+    obtain_settings
+    @current_setting = @settings_list.find_all{ |setting| setting[:setting_type_id] == params[:id].to_i}.first
+    if @current_setting.present?
+      Setting.save_setting(organization: @current_organization, user: @user, setting_type_id: params[:id], setting_value_id: params[:setting_value])
+      flash[:notice] = "update complete"
+    end
+    redirect_to settings_path(is_user_present?)
   end
 
   def destroy
@@ -40,6 +44,7 @@ class SettingsController < ApplicationController
   private
   
   def obtain_settings
+    # extracted from index, this logic determines what settings can be shown to the user
     @current_user_is_admin = current_user.has_admin_role_at @current_organization
     
     if @current_user_is_admin
@@ -50,5 +55,11 @@ class SettingsController < ApplicationController
     end
     
     @settings_list = Setting.list_settings(organization: @current_organization, user: @user, admin_right: @current_user_is_admin)
+  end
+  
+  def is_user_present?
+    if @user.present?
+      return { user_id: @user.id }
+    end
   end
 end

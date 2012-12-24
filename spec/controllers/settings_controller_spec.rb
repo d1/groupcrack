@@ -74,6 +74,10 @@ describe SettingsController do
     end
 
     it "will not find current setting, verify redirect to index" do
+      user = stub_model(User)
+      controller.stub :current_user => user
+      user.stub(:has_admin_role_at).and_return(true)
+      
       Setting.should_receive(:list_settings).and_return([
         {
           setting_type_id: 15,
@@ -99,7 +103,40 @@ describe SettingsController do
   end
   
   describe "update" do
-    # ... write update tests here
+    it "will redirect with user_id param when it is recieved" do
+      user = stub_model(User)
+      controller.stub :current_user => user
+      user.stub(:has_admin_role_at).and_return(false)
+      
+      put :update, :id => 123, :setting_value => 999, :user_id => 2
+      response.should redirect_to(settings_path(user_id: user.id))
+    end
+    
+    it "will update setting value when user is authorized" do
+      Setting.should_receive(:list_settings).and_return([
+        {
+          setting_type_id: 15,
+          name: "Setting 1",
+          description: "Text goes here",
+          value_id: 556,
+          value: 'yes',
+          value_name: 'Yes',
+          value_choice: 'default'
+        },
+        {
+          setting_type_id: 16,
+          name: "Setting 2",
+          description: "Other text goes here",
+          value: 'no',
+          value_name: 'No',
+          value_choice: 'selected'
+        }
+      ])
+      
+      Setting.should_receive(:save_setting)
+      put :update, :id => 15, :setting_value => 123
+    end
+
   end
   
 end
