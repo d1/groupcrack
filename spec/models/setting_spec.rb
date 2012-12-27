@@ -2,6 +2,70 @@ require 'spec_helper'
 
 describe Setting do
   
+  describe "save_setting" do
+    before do 
+      # set up a basic setting with no selected value
+      @default_value_setting_type = FactoryGirl.create(:setting_type)
+      # set up a basic setting with an already selected value
+      @hidden_user_setting_type = FactoryGirl.create(:user_hidden_setting_type)
+      # set up a user specific setting
+      @user_specific_site_setting = FactoryGirl.create(:site_user_setting)
+      # set up a organization specific setting
+      @org_specific_setting = FactoryGirl.create(:org_setting)
+    end
+
+    it "should not create a setting if the setting_value_id is not valid for that setting type" do
+      original_value = Setting.get_value(@default_value_setting_type.keyword)
+      invalid_setting_value_id = @hidden_user_setting_type.setting_values[0].id
+      Setting.save_setting(setting_type_id: @default_value_setting_type.id, setting_value_id: invalid_setting_value_id)
+      modified_value = Setting.get_value(@default_value_setting_type.keyword)
+      original_value.should == modified_value
+    end
+
+    it "should create a new setting value when one does not exist" do
+      @default_value_setting_type.setting_values.each do |setting_value|
+        if setting_value.default_value == 0
+          @saved_value = setting_value.keyword
+          Setting.save_setting(setting_type_id: @default_value_setting_type.id, setting_value_id: setting_value.id)
+          break
+        end
+      end
+      @saved_value.should == Setting.get_value(@default_value_setting_type.keyword)
+    end
+    
+    it "should not allow multiple setting records with the same type_id, org and user attributes to exist" do
+      setting_type = @user_specific_site_setting.setting_type
+      setting_type.setting_values[1].id      
+    end
+
+    it "should create a user organization specific setting value" do
+      user = FactoryGirl.create(:user)
+      organization = FactoryGirl.create(:organization)
+      @default_value_setting_type.setting_values.each do |setting_value|
+        if setting_value.default_value == 0
+          @saved_value = setting_value.keyword
+          Setting.save_setting(setting_type_id: @default_value_setting_type.id, setting_value_id: setting_value.id, user: user, organization: organization)
+          break
+        end
+      end
+      saved_results = Setting.where(setting_type_id: @default_value_setting_type.id, user_id: user.id, organization_id: organization.id)
+      saved_results.size.should == 1
+    end
+    
+    it "should replace an existing setting value" do
+      user = FactoryGirl.create(:user)
+      organization = FactoryGirl.create(:organization)
+      @default_value_setting_type.setting_values.each do |setting_value|
+        @last_setting_value_id = setting_value.id
+        Setting.save_setting(setting_type_id: @default_value_setting_type.id, setting_value_id: setting_value.id, user: user, organization: organization)
+      end
+      saved_results = Setting.where(setting_type_id: @default_value_setting_type.id, user_id: user.id, organization_id: organization.id)
+      saved_results.size.should == 1
+      saved_results[0].setting_value_id.should == @last_setting_value_id
+    end
+    
+  end
+  
   describe "listings" do
     
     before do

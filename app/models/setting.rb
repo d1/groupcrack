@@ -17,8 +17,10 @@ class Setting < ActiveRecord::Base
   def self.get_scope(options)
     # this method is only checking for the presence of an organization or organization_id, 
     # not that organization_id is a valid id or that organization is a valid object
-    org_present = options[:organization_id].present? || options[:organization].present?
-    user_present = options[:user_id].present? || options[:user].present?
+    options[:user_id] = options[:user].id if options[:user].present?
+    options[:organization_id] = options[:organization].id if options[:organization].present?
+    org_present = options[:organization_id].present?
+    user_present = options[:user_id].present?
 
     if org_present && user_present
       UserOrgSpecific
@@ -32,6 +34,43 @@ class Setting < ActiveRecord::Base
   end
   
   def self.save_setting(options)
+    scope = Setting.get_scope(options)
+    if options[:setting_type_id].present? && options[:setting_value_id].present?
+      setting_type = SettingType.find options[:setting_type_id]
+      setting_value = SettingValue.find options[:setting_value_id]
+      if setting_type.id == setting_value.setting_type_id
+        # check if an existing Setting already exists
+        new_setting = Setting.new
+        new_setting.setting_type_id = setting_type.id
+        new_setting.setting_value_id = setting_value.id
+        
+        existing_setting = Setting.where(setting_type_id: setting_type.id)
+        
+        if scope == Setting::UserOrgSpecific || scope == Setting::UserSpecific
+          new_setting.user_id = options[:user_id]
+          existing_setting = existing_setting.where(user_id: options[:user_id])
+        else
+          existing_setting = existing_setting.where("user_id is null")
+        end
+        
+        if scope == Setting::UserOrgSpecific || scope == Setting::OrgSpecific
+          new_setting.organization_id = options[:organization_id]
+          existing_setting = existing_setting.where(organization_id: options[:organization_id])
+        else
+          existing_setting = existing_setting.where("organization_id is null")
+        end
+        
+        # save new setting
+        existing_setting = existing_setting.first
+        if existing_setting.present?
+          existing_setting.setting_value_id = setting_value.id
+          existing_setting.save
+        else
+          new_setting.save
+        end
+        
+      end
+    end
   end
   
   def self.list_settings(options)
@@ -42,7 +81,6 @@ class Setting < ActiveRecord::Base
     if scope == Setting::UserOrgSpecific || scope == Setting::OrgSpecific
       setting_types_with_defaults = setting_types_with_defaults.where("(setting_types.site_or_org_specific = 'org' || setting_types.site_or_org_specific = 'both')")
       setting_types_with_selected_values = setting_types_with_selected_values.where("(setting_types.site_or_org_specific = 'org' || setting_types.site_or_org_specific = 'both')")
-      setting_types_with_selected_values = setting_types_with_selected_values.where("settings.organization_id = ?", options[:organization].id) if options[:organization].present?
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.organization_id = ?", options[:organization_id]) if options[:organization_id].present?
     else
       setting_types_with_defaults = setting_types_with_defaults.where("(setting_types.site_or_org_specific = 'site' || setting_types.site_or_org_specific = 'both')")
@@ -53,7 +91,6 @@ class Setting < ActiveRecord::Base
     if scope == Setting::UserOrgSpecific || scope == Setting::UserSpecific
       setting_types_with_defaults = setting_types_with_defaults.where("setting_types.user_specific = 1")
       setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.user_specific = 1")
-      setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user].id) if options[:user].present?
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id = ?", options[:user_id]) if options[:user_id].present?
     else
       setting_types_with_selected_values = setting_types_with_selected_values.where("settings.user_id is null")
