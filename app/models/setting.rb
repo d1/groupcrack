@@ -15,8 +15,8 @@ class Setting < ActiveRecord::Base
   UserOrgSpecific = Class.new  
   
   def self.get_scope(options)
-    # this method is only checking for the presence of an organization or organization_id, 
-    # not that organization_id is a valid id or that organization is a valid object
+    # this method is only checking for the presence of a user_id or organization_id 
+    # user and org objects that get passed in could be null
     options[:user_id] = options[:user].id if options[:user].present?
     options[:organization_id] = options[:organization].id if options[:organization].present?
     org_present = options[:organization_id].present?
@@ -39,11 +39,9 @@ class Setting < ActiveRecord::Base
       setting_type = SettingType.find options[:setting_type_id]
       setting_value = SettingValue.find options[:setting_value_id]
       if setting_type.id == setting_value.setting_type_id
-        # check if an existing Setting already exists
         new_setting = Setting.new
         new_setting.setting_type_id = setting_type.id
         new_setting.setting_value_id = setting_value.id
-        
         existing_setting = Setting.where(setting_type_id: setting_type.id)
         
         if scope == Setting::UserOrgSpecific || scope == Setting::UserSpecific
@@ -60,7 +58,6 @@ class Setting < ActiveRecord::Base
           existing_setting = existing_setting.where("organization_id is null")
         end
         
-        # save new setting
         existing_setting = existing_setting.first
         if existing_setting.present?
           existing_setting.setting_value_id = setting_value.id
@@ -102,6 +99,11 @@ class Setting < ActiveRecord::Base
       setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.user_modifiable = 1")
     end
     
+    if options[:setting_type_id].present?
+      setting_types_with_defaults = setting_types_with_defaults.where("setting_types.id = ?", options[:setting_type_id])
+      setting_types_with_selected_values = setting_types_with_selected_values.where("setting_types.id = ?", options[:setting_type_id])
+    end
+    
     settings_list = Array.new
     selected_values_hash = Hash.new
 
@@ -124,6 +126,8 @@ class Setting < ActiveRecord::Base
         setting_type_hash[:value_name] = selected_values_hash[setting_type.id.to_s].name
         setting_type_hash[:value_choice] = 'selected'
       else
+        # FIXME These default values should actually be the last possible value to be shown
+        # FIXME if there is a site wide setting set and the list is for an organization, the wrong default could be displayed 
         setting_type_hash[:value_id] = setting_type.setting_values[0].id
         setting_type_hash[:value] = setting_type.setting_values[0].keyword
         setting_type_hash[:value_name] = setting_type.setting_values[0].name

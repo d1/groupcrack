@@ -78,6 +78,14 @@ describe Setting do
       @non_user_setting = FactoryGirl.create(:non_user_setting)
     end
     
+    it "should properly show default settings when a global setting has been set"
+    it "should properly show default settings when an org specific setting has been set"
+    
+    it "should optionally return a list of only one specified setting type" do
+      setting_list = Setting.list_settings(organization: nil, user_id: nil, setting_type_id: @default_value_setting_type.id)
+      setting_list.size.should == 1
+    end
+    
     it "should include site settings when no organization is specified" do
       setting_list = Setting.list_settings(organization: nil, user_id: nil)
       setting_list.map{|setting| setting[:setting_type_id]}.should include @site_specific_setting.setting_type.id

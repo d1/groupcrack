@@ -54,7 +54,7 @@ class SettingsController < ApplicationController
       @user = current_user
     end
     
-    @settings_list = Setting.list_settings(organization: @current_organization, user: @user, admin_right: @current_user_is_admin)
+    @settings_list = Setting.list_settings(organization: @current_organization, user: @user, admin_right: @current_user_is_admin, setting_type_id: params[:id])
   end
   
   def is_user_present?

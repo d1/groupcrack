@@ -16,20 +16,20 @@ describe SettingsController do
   
   describe "index" do
     it "will show user settings by default" do
-      Setting.should_receive(:list_settings).with(:organization => nil, :user => @user, :admin_right => false)
+      Setting.should_receive(:list_settings).with(:organization => nil, :user => @user, :admin_right => false, :setting_type_id => nil)
       get :index
     end
     
     it "will show user's organizations settings when organization is present" do
       current_organization = FactoryGirl.create(:organization)
-      Setting.should_receive(:list_settings).with(:organization => current_organization, :user => @user, :admin_right => false)
+      Setting.should_receive(:list_settings).with(:organization => current_organization, :user => @user, :admin_right => false, :setting_type_id => nil)
       @request.host = "#{current_organization.subdomain}.example.com"
       get :index
     end
     
     it "will not allow another user to be passed to settings if not an admin" do
       current_organization = FactoryGirl.create(:organization)
-      Setting.should_receive(:list_settings).with(:organization => current_organization, :user => @user, :admin_right => false)
+      Setting.should_receive(:list_settings).with(:organization => current_organization, :user => @user, :admin_right => false, :setting_type_id => nil)
       @request.host = "#{current_organization.subdomain}.example.com"
       get :index, :user_id => 1234
     end
@@ -40,7 +40,7 @@ describe SettingsController do
       controller.stub :current_user => user
       user.stub(:has_admin_role_at).and_return(true)
       current_organization = FactoryGirl.create(:organization)
-      Setting.should_receive(:list_settings).with(:organization => current_organization, :user => some_other_user, :admin_right => true)
+      Setting.should_receive(:list_settings).with(:organization => current_organization, :user => some_other_user, :admin_right => true, :setting_type_id => nil)
       @request.host = "#{current_organization.subdomain}.example.com"
       get :index, :user_id => some_other_user.id
       assigns(:current_user_is_admin).should eq(true)
