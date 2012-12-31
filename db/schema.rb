@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121103181215) do
+ActiveRecord::Schema.define(:version => 20121230051445) do
 
   create_table "organization_role_settings", :force => true do |t|
     t.integer "organization_role_id"
@@ -30,10 +30,14 @@ ActiveRecord::Schema.define(:version => 20121103181215) do
     t.string   "name"
     t.string   "subdomain"
     t.text     "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
+    t.integer  "active",      :default => 1
+    t.integer  "approved",    :default => 1
   end
 
+  add_index "organizations", ["active"], :name => "index_organizations_on_active"
+  add_index "organizations", ["approved"], :name => "index_organizations_on_approved"
   add_index "organizations", ["subdomain"], :name => "index_organizations_on_subdomain", :unique => true
 
   create_table "seed_files", :force => true do |t|

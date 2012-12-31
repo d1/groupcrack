@@ -78,6 +78,10 @@ describe OrganizationsController do
   end
 
   describe "POST create" do
+    before do
+      Setting.should_receive(:get_user_value).with('create_new_organizations',@user).and_return('yes')
+    end
+    
     describe "with valid params" do
       it "creates a new Organization" do
         expect {

@@ -7,7 +7,7 @@ class OrganizationsController < ApplicationController
   end
 
   def show
-    @organization = Organization.find(params[:id])
+    @organization = Organization.unscoped.find(params[:id])
   end
 
   def new
@@ -19,14 +19,23 @@ class OrganizationsController < ApplicationController
   end
 
   def create
-    @organization = Organization.new(params[:organization])
+    new_org_permission = Setting.get_user_value('create_new_organizations', current_user)
+    unless new_org_permission == 'no' || new_org_permission == 'no_value'
+      @organization = Organization.new(params[:organization])
+      if new_org_permission == 'approval_required'
+        @organization.approved = 0
+      end
 
-    if @organization.save
-      OrganizationRole.create_org_roles(@organization)
-      @organization.assign_admin(current_user)
-      redirect_to @organization, notice: 'Organization was successfully created.'
+      if @organization.save
+        OrganizationRole.create_org_roles(@organization)
+        @organization.assign_admin(current_user)
+        redirect_to @organization, notice: 'Organization was successfully created.'
+      else
+        render action: "new"
+      end
     else
-      render action: "new"
+      flash[:error] =  'Unable to create new organizations at this time'
+      redirect_to organizations_path
     end
   end
 

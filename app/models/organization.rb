@@ -8,6 +8,8 @@ class Organization < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => true
   validates :subdomain, :presence => true, :uniqueness => true
   
+  default_scope { where(active: 1, approved: 1) }
+    
   def assign_admin(user)
     admin_role = OrganizationRole.where(organization_id: self.id, admin_role: 1).first
     if admin_role.present?
