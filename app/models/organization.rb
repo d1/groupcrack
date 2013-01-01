@@ -12,11 +12,15 @@ class Organization < ActiveRecord::Base
     
   def assign_admin(user)
     admin_role = OrganizationRole.where(organization_id: self.id, admin_role: 1).first
-    if admin_role.present?
+    if admin_role.nil?
+      admin_role = OrganizationRole.create(organization_id: self.id, admin_role: 1, name: 'Admin')
+    end
+    
+    current_membership = UserMembership.joins(:organization_role).
+      where('organization_roles.admin_role' => 1, user_id: user.id, organization_id: self.id).
+      where("end_date IS NULL").first
+    unless current_membership.present? 
       UserMembership.create(user_id: user.id, organization_id: self.id, organization_role_id: admin_role.id, start_date: Time.now)    
-    else
-      # somehow there is no admin organization_role tied to this organization.
-      # create one and then add the user to the newly created organization_role?
     end
   end
 end
