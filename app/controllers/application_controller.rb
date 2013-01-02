@@ -9,4 +9,10 @@ class ApplicationController < ActionController::Base
     @current_organization = Organization.where(subdomain: request.subdomains.last).first
   end
   
+  def validate_organization
+    if @current_organization.nil?
+      redirect_to welcome_path
+    end
+  end
+  
 end

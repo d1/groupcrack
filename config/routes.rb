@@ -4,7 +4,7 @@ Groupcrack::Application.routes.draw do
   resources :organizations
 
   match '/welcome', :to => "welcome#index", :via => :get, :as => :welcome
-  match '/about', :to => 'home#about', :via => :get, :as => :about
+  match '/about', :to => 'welcome#about', :via => :get, :as => :about
 
   devise_for :users
 
