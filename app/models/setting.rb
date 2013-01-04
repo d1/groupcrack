@@ -173,6 +173,21 @@ class Setting < ActiveRecord::Base
     end
   end
   
+  # this method was added to keep tests from breaking on multiple get_user_value mocks for different keywords
+  # this is the least worst solution to a problem that only exists within my test suite
+  def self.get_site_admin_value(user)
+    setting = Setting.includes(:setting_value, :setting_type).where(
+      "setting_types.keyword = 'site_administrator' && 
+      (settings.user_id = ? || settings.user_id is null) && settings.organization_id is null", 
+      user.id).order("settings.priority").first
+    if setting.present?
+      return setting.setting_value.keyword
+    else
+      return Setting.get_default_value('site_administrator')
+    end
+  end
+  
+  
   def self.get_org_value(keyword, org)
     setting = Setting.includes(:setting_value, :setting_type).where(
       "setting_types.keyword = ? && settings.user_id is null && 

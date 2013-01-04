@@ -41,7 +41,11 @@ class User < ActiveRecord::Base
   
   def has_setting_value(setting_keyword, setting_value)
     has_setting = false
-    user_setting = Setting.get_user_value(setting_keyword, self)
+    if setting_keyword == 'site_administrator'
+      user_setting = Setting.get_site_admin_value(self)
+    else
+      user_setting = Setting.get_user_value(setting_keyword, self)
+    end
     if user_setting == setting_value
       has_setting = true
     end

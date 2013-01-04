@@ -1,5 +1,7 @@
 Groupcrack::Application.routes.draw do
   
+  get "admin/index"
+
   resources :settings
   resources :organizations
 
